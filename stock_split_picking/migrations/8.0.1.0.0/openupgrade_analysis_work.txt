@@ -1,0 +1,6 @@
+# nothing to do
+
+---Fields in module 'stock_split_picking'---
+---XML records in module 'stock_split_picking'---
+NEW ir.ui.view: stock_split_picking.view_picking_form
+DEL ir.ui.view: stock_split_picking.xml_id
