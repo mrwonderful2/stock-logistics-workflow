@@ -29,6 +29,7 @@ Contributors
 * Pedro M. Baeza <pedro.baeza@gmail.com>
 * Yannick Vaucher <yannick.vaucher@camptocamp.com>
 * Rudolf Schnapka <rs@techno-flex.de>
+* Aaron Henriquez <ahenriquez@eficent.com>
 
 
 Maintainer

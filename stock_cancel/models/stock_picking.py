@@ -26,52 +26,39 @@
 from odoo import api, models, exceptions, _
 
 
-class StockMove(models.Model):
-    _inherit = 'stock.move'
-
-    def _check_restrictions(self):
-        # Restrictions before remove quants
-        if self.returned_move_ids or self.split_from:
-            raise exceptions.UserError(_('Action not allowed. Move splited / with returned moves.'))  # noqa
-
-
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
     @api.multi
-    def has_valuation_moves(self):
+    def cancel_valuation_moves(self):
         self.ensure_one()
         account_moves = self.env['account.move'].search(
             [('ref', '=', self.name)])
-        return bool(account_moves)
+        account_moves.button_cancel()
+        return account_moves
 
     def _check_restrictions(self):
-        # Only allow with incoming operations
-        # backorder_id in picking
         # returned_move_ids in stock.move
         # split_from in stock.move
-        if not self.picking_type_id.code == 'incoming':
-            raise exceptions.UserError(_('Allowed only with incoming operations.'))  # noqa
         if self.backorder_id:
-            raise exceptions.UserError(_('Not Allowed, picking has backorder.'))  # noqa
+            raise exceptions.UserError(
+                _('Not Allowed, picking has backorder.'))  # noqa
 
     @api.multi
     def action_revert_done(self):
         for picking in self:
             picking._check_restrictions()
-            if picking.has_valuation_moves():
+            picking.cancel_valuation_moves()
+            if picking.invoice_id.filtered(
+                    lambda order: order.state != 'cancel'):
                 raise exceptions.UserError(
-                    _('Picking %s has valuation moves: '
-                        'remove them first.')
-                    % (picking.name))
-            if picking.invoice_id:
-                raise exceptions.UserError(
-                    _('Picking %s has invoices!') % (picking.name))
+                    _('Picking %s has invoices') % (picking.name))
             picking.move_lines.write({'state': 'draft'})
-            # remove quants done
+            # reassign quants done
             for move in picking.move_lines:
                 move._check_restrictions()
-                move.quant_ids.with_context(force_unlink=True).unlink()
+                move.quant_ids._revert()
+                move.group_id.procurement_ids.reset_to_confirmed()
             picking.state = 'draft'
             picking.action_confirm()
             picking.do_prepare_partial()
