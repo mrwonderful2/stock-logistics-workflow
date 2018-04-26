@@ -35,3 +35,4 @@ class StockQuant(models.Model):
             previous_move = quant.history_ids[-1]
             previous_location = previous_move.location_id
             quant.location_id = previous_location.id
+            quant.write({'history_ids': [(3, quant.history_ids[-1].id)]})
