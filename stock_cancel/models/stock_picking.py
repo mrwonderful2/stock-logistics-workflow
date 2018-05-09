@@ -48,7 +48,8 @@ class StockPicking(models.Model):
     def action_revert_done(self):
         for picking in self:
             picking._check_restrictions()
-            picking.cancel_valuation_moves()
+            acc_moves = picking.cancel_valuation_moves()
+            acc_moves.unlink()
             if picking.invoice_id.filtered(
                     lambda order: order.state != 'cancel'):
                 raise exceptions.UserError(
