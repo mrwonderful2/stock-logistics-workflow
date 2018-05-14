@@ -20,7 +20,7 @@ class StockPicking(models.Model):
     def _check_restrictions(self):
         # returned_move_ids in stock.move
         # split_from in stock.move
-        if self.backorder_id:
+        if self.search([('backorder_id', '=', self.id)], limit=1):
             raise exceptions.UserError(
                 _('Not Allowed, picking has backorder.'))  # noqa
 
