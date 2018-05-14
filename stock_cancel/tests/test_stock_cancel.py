@@ -22,12 +22,10 @@ class TestStockCancel(SavepointCase):
         cls.partner = cls.env['res.partner'].create({
             'name': 'Test partner'})
 
-    def create_picking(self, partner, type, src=None, dest=None):
+    def create_picking(self, partner, p_type, src=None, dest=None):
         picking = self.env['stock.picking'].create({
             'partner_id': partner.id,
-            'picking_type_id': type.id,
-            'location_id': self.src_location.id,
-            'location_dest_id': self.cust_location.id,
+            'picking_type_id': p_type.id,
             'location_id': src or self.src_location.id,
             'location_dest_id': dest or self.cust_location.id,
         })
@@ -35,14 +33,14 @@ class TestStockCancel(SavepointCase):
 
     def create_move(self, pick, product, qty, src=None, dest=None):
         move = self.env['stock.move'].create({
-                    'name': '/',
-                    'picking_id': pick.id,
-                    'product_id': product.id,
-                    'product_uom_qty': qty,
-                    'product_uom': product.uom_id.id,
-                    'location_id': src or self.src_location.id,
-                    'location_dest_id': dest or self.cust_location.id,
-                })
+            'name': '/',
+            'picking_id': pick.id,
+            'product_id': product.id,
+            'product_uom_qty': qty,
+            'product_uom': product.uom_id.id,
+            'location_id': src or self.src_location.id,
+            'location_dest_id': dest or self.cust_location.id,
+        })
         return move
 
     def create_invoice(self):
