@@ -131,3 +131,43 @@ class TestStockCancel(SavepointCase):
                          "Quant in wrong location")
         self.assertEqual(quant.qty, 8.0,
                          "Quant wrong qty")
+
+    def test_sale_qty(self):
+        so_vals = {
+            'partner_id': self.partner.id,
+            'partner_invoice_id': self.partner.id,
+            'partner_shipping_id': self.partner.id,
+            'order_line': [(0, 0, {
+                'name': self.product.name,
+                'product_id': self.product.id,
+                'product_uom_qty': 5.0,
+                'product_uom': self.product.uom_id.id,
+                'price_unit': self.product.list_price})],
+        }
+        so = self.env['sale.order'].create(so_vals)
+
+        # confirm our standard so, check the picking
+        so.action_confirm()
+        # deliver completely
+        pick = so.picking_ids
+        pick.force_assign()
+        pick.pack_operation_product_ids.write({'qty_done': 5})
+        pick.do_new_transfer()
+        self.assertEqual(
+            so.order_line[0].qty_delivered, 5, "SO not delivering")
+        pick.action_revert_done()
+        self.assertEqual(
+            so.order_line[0].qty_delivered, 0, "QTY delivered not correct")
+
+    def test_chained(self):
+        picking1 = self.create_picking(
+            self.partner, self.env.ref('stock.picking_type_internal'))
+        move1 = self.create_move(
+            picking1, self.product, 10.0)
+        picking2 = self.create_picking(
+            self.partner, self.env.ref('stock.picking_type_out'))
+        move2 = self.create_move(
+            picking2, self.product, 10.0)
+        move1.write({'move_dest_id': move2.id})
+        with self.assertRaises(UserError):
+            picking1.action_revert_done()
