@@ -39,7 +39,12 @@ class StockPicking(models.Model):
             for move in picking.move_lines:
                 move._check_restrictions()
                 move.quant_ids._revert()
-                move.group_id.procurement_ids.reset_to_confirmed()
+
+            picking.group_id.procurement_ids.reset_to_confirmed()
+            sale_lines = picking.group_id.procurement_ids.mapped(
+                'sale_line_id')
+            for line in sale_lines:
+                line.qty_delivered = line._get_delivered_qty()
             picking.state = 'draft'
             picking.action_confirm()
             picking.do_prepare_partial()
