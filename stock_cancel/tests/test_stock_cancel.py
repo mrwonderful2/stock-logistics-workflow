@@ -123,6 +123,8 @@ class TestStockCancel(SavepointCase):
         picking.action_assign()
         picking.do_transfer()
         picking.action_revert_done()
+        self.assertEqual(len(picking.group_id.procurement_ids.mapped(
+            'sale_line_id')), 1, "sale delivery line not deleted")
         self.assertEqual(picking.state, 'confirmed')
         quant = move_in.quant_ids[-1]
         previous_move = quant.history_ids[-1]
