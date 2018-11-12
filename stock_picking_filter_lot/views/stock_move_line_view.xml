@@ -12,6 +12,9 @@
             <field name="lot_id" position="attributes">
                 <attribute name="domain">[('product_id','=', parent.product_id),('location_ids', 'child_of', location_id)]</attribute>
             </field>
+            <field name="lot_id" position="after">
+                <field name="qty_loc_lot" groups="stock.group_production_lot"/>
+            </field>
         </field>
     </record>
 

@@ -12,6 +12,9 @@
             <xpath expr="//field[@name='move_line_ids']/tree/field[@name='lot_id']" position="attributes">
                 <attribute name="domain">[('product_id','=', product_id),('location_ids', 'child_of', location_id)]</attribute>
             </xpath>
+            <xpath expr="//field[@name='move_line_ids']/tree/field[@name='lot_id']" position="after">
+                <field name="qty_loc_lot" groups="stock.group_production_lot"/>
+            </xpath>
         </field>
     </record>
 

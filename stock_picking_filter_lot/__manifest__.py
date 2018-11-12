@@ -5,7 +5,7 @@
     "name": "Stock picking filter lot",
     "summary": "In picking out lots' selection, "
                "filter lots based on their location",
-    "version": "11.0.1.0.0",
+    "version": "11.0.1.1.0",
     "category": "Warehouse",
     "website": "https://github.com/OCA/stock-logistics-workflow/tree/"
                "11.0/stock_filter_lot",
